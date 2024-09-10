@@ -1,10 +1,8 @@
-name: melloddy_pipeline
+name: melloddy_pipeline_2024
 channels:
   - rdkit
-  - defaults
   - conda-forge
   - pytorch
-  - anaconda
 dependencies:
   - mkl
   - mkl_random
@@ -34,4 +32,5 @@ dependencies:
   - pip:
     - pandera
     - pynvml==11.0.0
+    - mordredcommunity
 

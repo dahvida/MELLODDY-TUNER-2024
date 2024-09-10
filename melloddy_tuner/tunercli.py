@@ -1444,7 +1444,8 @@ def do_prepare_training(args):
         y_matrix_clf,
         y_matrix_reg,
         censored_mask,
-    ) = csv_2_mtx.make_matrices(df_T11, T10c_cont, T10r_cont, bit_size)
+    ) = csv_2_mtx.make_matrices(df_T11, T10c_cont, T10r_cont, bit_size, 
+                                config.parameters.get_parameters()["fingerprint"]["desc_type"])
     dict_matrices = {}
     del df_T11, T10c_cont, T10r_cont
     y_matrix_clf.data = np.nan_to_num(y_matrix_clf.data, copy=False)
