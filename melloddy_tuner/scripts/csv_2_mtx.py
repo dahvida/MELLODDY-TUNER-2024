@@ -100,7 +100,7 @@ def init_arg_parser() -> Namespace:
     return args
 
 
-def matrix_from_strucutres(df: DataFrame, bit_size: int) -> csr_matrix:
+def matrix_from_strucutres(df: DataFrame, bit_size: int, desc_type: str) -> csr_matrix:
     """
     Create sparse matrix in csr format from dataframe by mapping it to certain bitsize.
 
@@ -114,22 +114,26 @@ def matrix_from_strucutres(df: DataFrame, bit_size: int) -> csr_matrix:
     # create a dictionary mapping ecfp hash keys to column indices in X.mtx used for training
     # ofc, the file here should be passed as a new argument
 
-    df["fp_feat"] = df["fp_feat"].str[1:-1]
-    cols = df.columns.difference(["fp_feat"])
-    bits = df.fp_feat.str.split(",")
-    x_ijv_df = df.loc[df.index.repeat(bits.str.len()), cols].assign(
-        bits=list(chain.from_iterable(bits.tolist()))
-    )
-    x_ijv_df["bits"] = x_ijv_df["bits"].astype(np.int32)
-    # works only for binary here: but could pick up the values in column fp_val
-    x_ijv_df["value"] = np.ones(x_ijv_df.shape[0]).astype(np.int8)
-    data = x_ijv_df["value"].values
+    if desc_type.lower() == "ecfp":
+        df["fp_feat"] = df["fp_feat"].str[1:-1]
+        cols = df.columns.difference(["fp_feat"])
+        bits = df.fp_feat.str.split(",")
+        x_ijv_df = df.loc[df.index.repeat(bits.str.len()), cols].assign(
+            bits=list(chain.from_iterable(bits.tolist()))
+        )
+        x_ijv_df["bits"] = x_ijv_df["bits"].astype(np.int32)
+        # works only for binary here: but could pick up the values in column fp_val
+        x_ijv_df["value"] = np.ones(x_ijv_df.shape[0]).astype(np.int8)
+        data = x_ijv_df["value"].values
 
-    # get the row coordinates of the X matrix
-    I, J = x_ijv_df["cont_descriptor_vector_id"], x_ijv_df["bits"]
+        # get the row coordinates of the X matrix
+        I, J = x_ijv_df["cont_descriptor_vector_id"], x_ijv_df["bits"]
 
-    # create the matrix, make sure it has the right dimension: here [number molecules to predict x number  defined by the parameter 'fold_size']
-    matrix = csr_matrix((data.astype(np.int8), (I, J)), shape=(df.shape[0], bit_size))
+        # create the matrix, make sure it has the right dimension: here [number molecules to predict x number  defined by the parameter 'fold_size']
+        matrix = csr_matrix((data.astype(np.int8), (I, J)), shape=(df.shape[0], bit_size))
+    else:
+        x = np.array(df["fp_feat"].tolist())
+        matrix = csr_matrix(x)
 
     return matrix
 
@@ -297,7 +301,8 @@ def prepare(args: dict, overwriting: bool) -> Path:
 
 
 def make_matrices(
-    df_T11: DataFrame, df_T10c: DataFrame, df_T10r: DataFrame, bit_size: int
+    df_T11: DataFrame, df_T10c: DataFrame, df_T10r: DataFrame, bit_size: int, 
+    desc_type: str
 ) -> Tuple:
     """
     Wrapper to create X and Y matrices and fold vector.
@@ -310,7 +315,7 @@ def make_matrices(
     Returns:
         Tuple: X matrix, Y matrix, fold vector
     """
-    x_matrix = matrix_from_strucutres(df_T11, bit_size)
+    x_matrix = matrix_from_strucutres(df_T11, bit_size, desc_type)
     # return x_matrix
     fold_vector = folding_from_structure(df_T11)
     y_matrix_clf, y_matrix_reg, y_censored_mask = matrix_from_activity(df_T10c, df_T10r)

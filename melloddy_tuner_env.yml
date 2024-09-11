@@ -1,4 +1,4 @@
-name: melloddy_pipeline_2024
+name: melloddy_tuner_2024
 channels:
   - rdkit
   - conda-forge

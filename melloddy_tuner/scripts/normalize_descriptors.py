@@ -104,7 +104,7 @@ def main(args):
                               nan = args.nan_value,
                               posinf = args.posinf_value,
                               neginf = args.neginf_value)
-            print(f"NaN replaced with {args.nan}, values bound between {args.neginf_value} and {args.posinf_value}")
+            print(f"NaN replaced with {args.nan_value}, values bound between {args.neginf_value} and {args.posinf_value}")
         else:
             nan_idx = np.where(np.isnan(x))[0]
             x = x[~nan_idx]
@@ -117,6 +117,7 @@ def main(args):
 
         # run feature selection
         print(f"Running feature selection with threshold {args.variance_threshold}...")
+        print(f"Initially found {x.shape[1]} descriptors...")
         start_n = x.shape[1]
         train_idx = np.where(np.isin(x, [1, 2, 3]))[0]
         x_train = x[train_idx]

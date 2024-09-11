@@ -6,11 +6,30 @@ from rdkit.Chem import MolFromSmiles
 from rdkit.Chem.AllChem import GetHashedMorganFingerprint, GetMorganFingerprint
 from rdkit.Chem import Descriptors
 from rdkit.ML.Descriptors.MoleculeDescriptors import MolecularDescriptorCalculator
+from mordred import (
+                    Calculator,
 
+                    AcidBase, ABCIndex, Autocorrelation, BalabanJ, BaryszMatrix,
+                    DetourMatrix, DistanceMatrix, HydrogenBond, MoeType,
+                    LogS, McGowanVolume, Polarizability, SLogP, TopoPSA, TopologicalCharge,
+                    TopologicalIndex, VdwVolumeABC, WienerIndex, ZagrebIndex,
+
+                    CPSA, GeometricalIndex, GravitationalIndex, MoRSE, MomentOfInertia,
+                    PBF 
+                    )
+from mordred.error import Missing
 import numpy as np
 import copy
 import logging
 
+def parse_mordred_output(mordred_output):
+    descriptors = []
+    for desc in mordred_output:
+        if isinstance(desc, Missing):
+            descriptors.append(np.nan)
+        else:
+            descriptors.append(desc)
+    return tuple(descriptors)
 
 class DescriptorCalculator(object):
     """
@@ -44,7 +63,6 @@ class DescriptorCalculator(object):
         self.rdkit_custom_descriptors = ['MaxEStateIndex', 'MinEStateIndex', 'MaxAbsEStateIndex', 'MinAbsEStateIndex',
         'qed', 'MolWt', 'HeavyAtomMolWt', 'ExactMolWt', 'NumValenceElectrons',
         'NumRadicalElectrons', 'MaxPartialCharge', 'MinPartialCharge', 'MaxAbsPartialCharge',
-        'MinAbsPartialCharge', 'FpDensityMorgan1', 'FpDensityMorgan2', 'FpDensityMorgan3',
         'BalabanJ', 'BertzCT', 'Chi0', 'Chi0n', 'Chi0v', 'Chi1', 'Chi1n', 'Chi1v',
         'Chi2n', 'Chi2v', 'Chi3n', 'Chi3v', 'Chi4n', 'Chi4v', 'HallKierAlpha', 'Ipc',
         'Kappa1', 'Kappa2', 'Kappa3', 'LabuteASA', 'PEOE_VSA1', 'PEOE_VSA10', 'PEOE_VSA11', 'PEOE_VSA12',
@@ -61,14 +79,20 @@ class DescriptorCalculator(object):
         'EState_VSA6', 'EState_VSA7', 'EState_VSA8', 'EState_VSA9',
         'VSA_EState1', 'VSA_EState10', 'VSA_EState2', 'VSA_EState3',
         'VSA_EState4', 'VSA_EState5', 'VSA_EState6', 'VSA_EState7',
-        'VSA_EState8', 'VSA_EState9', 'FractionCSP3', 'HeavyAtomCount',
-        'NHOHCount', 'NOCount', 'NumAliphaticCarbocycles', 'NumAliphaticHeterocycles', 'NumAliphaticRings',
-        'NumAromaticCarbocycles', 'NumAromaticHeterocycles', 'NumAromaticRings', 'NumHAcceptors',
-        'NumHDonors', 'NumHeteroatoms', 'NumRotatableBonds', 'NumSaturatedCarbocycles',
-        'NumSaturatedHeterocycles', 'NumSaturatedRings', 'RingCount', 'MolLogP',
+        'VSA_EState8', 'VSA_EState9', 'FractionCSP3',
+        'MolLogP',
         'MolMR']
-        
-
+        self.mordred_all_descriptors = [
+            AcidBase, ABCIndex, Autocorrelation, BalabanJ, BaryszMatrix,
+            DetourMatrix, DistanceMatrix, HydrogenBond, MoeType,
+            LogS, McGowanVolume, Polarizability, SLogP, TopoPSA, TopologicalCharge,
+            TopologicalIndex, VdwVolumeABC, WienerIndex, ZagrebIndex]
+        self.mordred_custom_descriptors = [
+            AcidBase, MoeType, LogS, McGowanVolume, Polarizability, SLogP, TopoPSA,
+            TopologicalCharge, VdwVolumeABC]
+        self.mordred_3D_descriptors = [
+            CPSA, GeometricalIndex, GravitationalIndex, MoRSE, MomentOfInertia,
+            PBF]
 
     # functions enabling pickle
     def __getstate__(self):
@@ -156,6 +180,15 @@ class DescriptorCalculator(object):
         elif self.desc_type.lower() == "rdkit_custom":
             calc = MolecularDescriptorCalculator(self.rdkit_custom_descriptors)
             return calc.CalcDescriptors(mol)
+        elif self.desc_type.lower() == "mordred_all":
+            calc = Calculator(self.mordred_all_descriptors)
+            return parse_mordred_output(calc(mol))
+        elif self.desc_type.lower() == "mordred_custom":
+            calc = Calculator(self.mordred_custom_descriptors)
+            return parse_mordred_output(calc(mol))
+        elif self.desc_type.lower() == "mordred_3D":
+            calc = Calculator(self.mordred_3D_descriptors)
+            return calc(mol)
 
     def scramble_fp(self, mol_fp):
         fp_feat = np.array(list(mol_fp.keys()))

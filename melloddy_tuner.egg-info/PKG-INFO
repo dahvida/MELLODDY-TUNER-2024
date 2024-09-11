@@ -1,0 +1,22 @@
+Metadata-Version: 2.1
+Name: melloddy-tuner
+Version: 3.0.3a0
+Summary: melloddy_tuner
+Home-page: https://github.com/melloddy/MELLODDY-TUNER
+Author: Lukas Friedrich
+Author-email: lukas.friedrich@merckgroup.com
+License: MIT License
+Platform: UNKNOWN
+License-File: LICENSE
+
+
+      Processing and standardization of structure and bioactivity data for federated machine learning models in drug discovery.
+
+      MELLODDY-PROJECT
+      =============
+      https://www.melloddy.eu
+
+
+      This tool is hosted at https://github.com/melloddy/MELLODDY-TUNER
+      
+
