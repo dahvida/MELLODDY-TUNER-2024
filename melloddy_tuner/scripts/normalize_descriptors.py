@@ -19,11 +19,11 @@ parser.add_argument("--nan_value", type=float,
 
 parser.add_argument("--neginf_value", type=float,
                     help="Minimum value allowed for the dataset (used to catch neginf or similar outliers)",
-                    default=1e-8)
+                    default=-1e6)
 
 parser.add_argument("--posinf_value", type=float,
                     help="Maximum value allowed for the dataset (used to catch posinf or similar outliers)",
-                    default=1e8)
+                    default=1e6)
 
 parser.add_argument("--standard_scale", action="store_true", 
                     help="Whether to use a standardscaler on the dataset, fitting on folds [1,2,3]")

@@ -1,0 +1,9 @@
+{
+  "fingerprint": {
+    "radius": 3,
+    "hashed": true,
+    "fold_size": 32000,
+    "binarized": true,
+    "desc_type": "mordred_all"
+  }
+}
