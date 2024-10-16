@@ -1,0 +1,11 @@
+{
+    "path": "path to matrices folder (above wo_aux folder)",
+    "fill_na": true,
+    "nan_value": 0.0,
+    "posinf_value": 1e6,
+    "neginf_value": -1e6,
+    "standard_scale": true,
+    "minmax_scale": false,
+    "quantile_scale": false,
+    "variance_threshold": 0.001
+}

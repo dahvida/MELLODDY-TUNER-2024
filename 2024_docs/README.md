@@ -9,3 +9,6 @@ To run the pipeline with different descriptors, simply run `prepare_4_training` 
 To postprocess the computed descriptors, you need to run `normalize_descriptors.py`, using `normalize_descs.json` as an argument.
 
 Once you have run `normalize_descriptors.py`, you can proceed with training as usual.
+
+## Sharing configs
+Please add your config files in a designated folder. See [ME_params](./ME_params/) as an example.

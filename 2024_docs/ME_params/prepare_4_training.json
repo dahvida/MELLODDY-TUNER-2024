@@ -1,0 +1,19 @@
+{
+    "structure_file": "foo",
+    "activity_files": [
+        "foo"
+    ],
+    "weight_tables": [
+        "foo"
+    ],
+    "catalog_file": "foo",
+    "config_file": "prepare_4_training_config.json",
+    "key_file": "example_key.json",
+    "output_dir": "foo",
+    "run_name": "foo",
+    "using_auxiliary": "no",
+    "number_cpu": 128,
+    "ref_hash": null,
+    "non_interactive": true,
+    "folding_method": "scaffold"
+}
