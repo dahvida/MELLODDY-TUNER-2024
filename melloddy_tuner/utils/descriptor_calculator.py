@@ -21,6 +21,7 @@ from mordred.error import Missing
 import numpy as np
 import copy
 import logging
+from molfeat.trans.pretrained import PretrainedDGLTransformer, PretrainedHFTransformer
 
 def parse_mordred_output(mordred_output):
     descriptors = []
@@ -30,6 +31,12 @@ def parse_mordred_output(mordred_output):
         else:
             descriptors.append(desc)
     return tuple(descriptors)
+
+def parse_gin_output(gin_output):
+    out = []
+    for i in range(gin_output.shape[1]):
+        out.append(gin_output[0,i])
+    return tuple(out)
 
 class DescriptorCalculator(object):
     """
@@ -93,7 +100,8 @@ class DescriptorCalculator(object):
         self.mordred_3D_descriptors = [
             CPSA, GeometricalIndex, GravitationalIndex, MoRSE, MomentOfInertia,
             PBF]
-
+        self.gin_infomax = PretrainedDGLTransformer(kind='gin_supervised_infomax', dtype=float)
+        #self.chemgpt = PretrainedHFTransformer(kind='ChemGPT-4.7M', notation='selfies', dtype=float)
     # functions enabling pickle
     def __getstate__(self):
         return (
@@ -189,6 +197,8 @@ class DescriptorCalculator(object):
         elif self.desc_type.lower() == "mordred_3D":
             calc = Calculator(self.mordred_3D_descriptors)
             return calc(mol)
+        elif self.desc_type.lower() == "gin_infomax":
+            return parse_gin_output(self.gin_infomax(smiles))
 
     def scramble_fp(self, mol_fp):
         fp_feat = np.array(list(mol_fp.keys()))

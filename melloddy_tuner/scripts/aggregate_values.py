@@ -434,8 +434,11 @@ def aggregate_replicates(
     df.reset_index(drop=True, inplace=True)
 
     # Identify duplicates
+    # (DB) modified to ignore duplicates in terms of descriptors
     duplicates = df.duplicated(
-        subset=["input_assay_id", "descriptor_vector_id", "fold_id"], keep=False
+        subset=["input_assay_id", 
+                "descriptor_vector_id", 
+                "fold_id"], keep=False
     )
     ind_dup = df.index[duplicates]
     df_dup = df.loc[ind_dup, :].copy()
